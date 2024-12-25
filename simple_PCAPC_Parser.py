@@ -1,12 +1,80 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog, messagebox
 import os
+import re
+import csv
 import json
 from threading import Thread
 import sys
 import subprocess
 import tabulate
 from collections import defaultdict
+
+# PCAP Analyzer GUI Application
+# ============================
+
+# A graphical tool for analyzing PCAP (Packet Capture) files with various analysis features.
+
+# Dependencies:
+# ------------
+# - tkinter: GUI framework
+# - scapy: Packet manipulation and analysis
+# - tabulate: Data formatting
+# - ebcdic: Character encoding support
+# - csv: CSV file handling
+# - re: Regular expression operations
+
+# Main Features:
+# -------------
+# 1. PCAP file loading and analysis
+# 2. Network session analysis
+# 3. Packet content searching
+# 4. Known malicious IP checking
+# 5. Credential detection
+# 6. Network stream reconstruction
+
+# Class Structure:
+# ---------------
+# PcapAnalyzerGUI:
+#     Main application class that handles all GUI elements and analysis functions.
+
+# Methods:
+#     - __init__: Initializes the GUI and sets up the main window
+#     - select_pcap: Handles PCAP file selection
+#     - select_known_items: Handles known items CSV file selection
+#     - display_paginated_output: Displays formatted output in the text area
+#     - show_summary: Displays PCAP file summary statistics
+#     - show_sessions: Shows network session information
+#     - show_search: Implements search functionality
+#     - show_known_items: Checks packets against known items
+#     - find_credentials: Searches for potential credentials
+#     - reconstruct_streams: Reconstructs network streams from packets
+
+# Usage:
+# ------
+# 1. Run the application
+# 2. Select a PCAP file using the 'Select PCAP File' button
+# 3. Optionally select a known items CSV file
+# 4. Use the various analysis buttons to examine the PCAP data
+
+# Notes:
+# ------
+# - Large PCAP files may take time to process
+# - Memory usage increases with PCAP file size
+# - Some features require both PCAP and known items files
+
+# Error Handling:
+# --------------
+# - Checks for required dependencies
+# - Validates file selections
+# - Handles parsing and processing errors
+
+# Future Improvements:
+# ------------------
+# - Add multi-threading for large file processing
+# - Implement data export functionality
+# - Add more analysis features
+# - Improve stream reconstruction accuracy
 
 def check_dependencies():
     required_packages = ['scapy', 'tabulate', 'ebcdic']
@@ -95,10 +163,13 @@ class PcapAnalyzerGUI:
         filename = filedialog.askopenfilename(
             filetypes=[("PCAP files", "*.pcap *.pcapng")])
         if filename:
-            self.pcap_file = filename
-            self.pcap_label.config(text=filename.split("/")[-1])
-            self.packets = rdpcap(filename)
-            
+            try:
+                self.pcap_file = filename
+                self.pcap_label.config(text=filename.split("/")[-1])
+                self.packets = scapy.rdpcap(filename)  # Use scapy.rdpcap instead
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to read PCAP file: {str(e)}")
+                            
     def select_known_items(self):
         filename = filedialog.askopenfilename(
             filetypes=[("CSV files", "*.csv")])
@@ -500,4 +571,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = PcapAnalyzerGUI(root)
     root.mainloop()
-
