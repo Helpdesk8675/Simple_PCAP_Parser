@@ -76,6 +76,9 @@ from collections import defaultdict
 # - Add more analysis features
 # - Improve stream reconstruction accuracy
 
+# Author: helpdesk8675
+# License: MIT License
+
 def check_dependencies():
     required_packages = ['scapy', 'tabulate', 'ebcdic']
     missing_packages = []
